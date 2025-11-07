@@ -1,4 +1,0 @@
-- Hi, I am Deepak
-- I'm interested in performance tuning, SRE and architecting cloud :)
-- I'm currently learning Terraform and Data Engineering
-- You can reach me @deepak.prasanth@gmail.com
