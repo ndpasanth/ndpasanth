@@ -1,0 +1,40 @@
+name: CI/CD Pipeline for Static Site
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write    # required for OIDC to assume AWS role
+  contents: read     # required by actions/checkout
+
+env:
+  BUCKET_NAME: ai-static-site-2025-dpn  # (optional) can be moved to repo variables
+  AWS_REGION: us-east-1                 # (optional) can be moved to repo variables
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify site files exist
+        run: |
+          if [ ! -f site/index.html ]; then
+            echo "Error: site/index.html not found"
+            exit 1
+          fi
+          echo "Site files verified successfully"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::946248011760:role/GitHubS3DeployRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to S3
+        run: |
+          aws s3 sync site/ s3://${{ env.BUCKET_NAME }} --delete --region ${{ env.AWS_REGION }}
+
